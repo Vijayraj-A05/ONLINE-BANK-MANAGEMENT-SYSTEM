@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Online Banking</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1>Online Bank</h1>
+            <ul>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="deposit.html">Deposit</a></li>
+                <li><a href="withdraw.html">Withdraw</a></li>
+                <li><a href="transactions.html">Transactions</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card balance-card" style="margin-top: 20px;">
+            <h3>Current Balance</h3>
+            <h1 class="balance-amount">Loading...</h1>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Deposit Money</h3>
+                <p>Add funds to your account securely.</p>
+                <br>
+                <a href="deposit.html" class="btn">Deposit Now</a>
+            </div>
+            <div class="card">
+                <h3>Withdraw Money</h3>
+                <p>Access your funds anytime, anywhere.</p>
+                <br>
+                <a href="withdraw.html" class="btn">Withdraw Now</a>
+            </div>
+            <div class="card">
+                <h3>Transaction History</h3>
+                <p>View your past deposits and withdrawals.</p>
+                <br>
+                <a href="transactions.html" class="btn">View History</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/banking.js"></script>
+    <script>
+        // Load balance on init
+        getBalance();
+    </script>
+</body>
+
+</html>
