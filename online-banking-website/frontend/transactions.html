@@ -4,43 +4,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transactions - Online Banking</title>
+    <title>Transactions - Online Bank</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filters input,
+        .filters select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            flex: 1;
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+    </style>
 </head>
 
 <body>
     <nav class="navbar">
         <div class="container">
-            <h1>Online Bank</h1>
+            <div class="logo">Online Bank</div>
             <ul>
                 <li><a href="dashboard.html">Dashboard</a></li>
-                <li><a href="deposit.html">Deposit</a></li>
-                <li><a href="withdraw.html">Withdraw</a></li>
-                <li><a href="transactions.html">Transactions</a></li>
-                <li><a href="#" onclick="logout()">Logout</a></li>
+                <li><a href="transactions.html" class="active">History</a></li>
             </ul>
         </div>
     </nav>
 
     <div class="container">
         <div class="card" style="margin-top: 20px;">
-            <h2>Transaction History</h2>
+            <h2><i class="fas fa-list-alt"></i> Transaction History</h2>
+
+            <div class="filters">
+                <input type="text" id="searchInput" placeholder="Search by amount or ID..."
+                    onkeyup="filterTransactions()">
+                <select id="typeFilter" onchange="filterTransactions()">
+                    <option value="ALL">All Types</option>
+                    <option value="DEPOSIT">Deposits</option>
+                    <option value="WITHDRAW">Withdrawals</option>
+                    <option value="TRANSFER_SENT">Transfers Sent</option>
+                    <option value="TRANSFER_RECEIVED">Transfers Received</option>
+                </select>
+            </div>
+
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Date</th>
+                        <th>Date & Time</th>
                         <th>Type</th>
                         <th>Amount</th>
+                        <th>Balance</th>
                     </tr>
                 </thead>
                 <tbody id="transactions-body">
-                    <tr>
-                        <td colspan="3">Loading...</td>
-                    </tr>
+                    <!-- JS fills this -->
                 </tbody>
             </table>
+
             <br>
-            <a href="dashboard.html">&larr; Back to Dashboard</a>
+            <a href="dashboard.html" class="btn btn-outline">&larr; Back to Dashboard</a>
         </div>
     </div>
 

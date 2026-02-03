@@ -4,57 +4,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Online Banking</title>
+    <title>Dashboard - Online Bank</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Insight Cards */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .insight-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .insight-card h4 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .insight-card p {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .warn-balance {
+            color: #dc3545;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
 
 <body>
     <nav class="navbar">
         <div class="container">
-            <h1>Online Bank</h1>
+            <div class="logo">
+                <i class="fas fa-university"></i> Online Bank
+            </div>
             <ul>
-                <li><a href="dashboard.html">Dashboard</a></li>
-                <li><a href="deposit.html">Deposit</a></li>
-                <li><a href="withdraw.html">Withdraw</a></li>
-                <li><a href="transactions.html">Transactions</a></li>
-                <li><a href="#" onclick="logout()">Logout</a></li>
+                <li><a href="dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="deposit.html"><i class="fas fa-plus-circle"></i> Deposit</a></li>
+                <li><a href="withdraw.html"><i class="fas fa-minus-circle"></i> Withdraw</a></li>
+                <li><a href="#" id="transferLink"><i class="fas fa-exchange-alt"></i> Transfer</a></li>
+                <li><a href="transactions.html"><i class="fas fa-history"></i> History</a></li>
+                <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
+            <button id="themeToggle" class="theme-btn"><i class="fas fa-moon"></i></button>
         </div>
     </nav>
 
     <div class="container">
-        <div class="card balance-card" style="margin-top: 20px;">
-            <h3>Current Balance</h3>
-            <h1 class="balance-amount">Loading...</h1>
+        <!-- Welcome Section -->
+        <div class="welcome-bar"
+            style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <h2>Welcome back, <span id="userFullName" style="color: var(--primary-color);">...</span></h2>
+                <p class="last-login" style="color: var(--text-muted); font-size: 0.9rem;">Last Login: <span
+                        id="lastLoginTime">--</span></p>
+            </div>
+            <div id="lowBalanceWarning" style="display:none; color: red; font-weight: bold;">
+                <i class="fas fa-exclamation-triangle"></i> Low Balance!
+            </div>
         </div>
 
+        <!-- Insights Grid -->
+        <div class="insights-grid">
+            <div class="insight-card" style="border-color: #28a745;">
+                <h4><i class="fas fa-arrow-down"></i> Total Deposited (This Month)</h4>
+                <p class="insight-val" id="totalIn">$0.00</p>
+            </div>
+            <div class="insight-card" style="border-color: #dc3545;">
+                <h4><i class="fas fa-arrow-up"></i> Total Withdrawn (This Month)</h4>
+                <p class="insight-val" id="totalOut">$0.00</p>
+            </div>
+            <div class="insight-card" style="border-color: #f1c40f;">
+                <h4><i class="fas fa-chart-line"></i> Highest Transaction</h4>
+                <p class="insight-val" id="maxTxn">$0.00</p>
+            </div>
+        </div>
+
+        <!-- Main Balance Card -->
+        <div class="card balance-card">
+            <h3><i class="fas fa-wallet"></i> Available Balance</h3>
+            <h1 class="balance-amount">$0.00</h1>
+            <p class="account-num">Acct: <span id="accountNumber">...</span></p>
+        </div>
+
+        <!-- Quick Actions Grid -->
         <div class="dashboard-grid">
-            <div class="card">
-                <h3>Deposit Money</h3>
-                <p>Add funds to your account securely.</p>
-                <br>
-                <a href="deposit.html" class="btn">Deposit Now</a>
+            <div class="card action-card">
+                <div class="icon-box deposit-icon"><i class="fas fa-arrow-down"></i></div>
+                <h3>Deposit</h3>
+                <a href="deposit.html" class="btn btn-outline">Add Funds</a>
             </div>
-            <div class="card">
-                <h3>Withdraw Money</h3>
-                <p>Access your funds anytime, anywhere.</p>
-                <br>
-                <a href="withdraw.html" class="btn">Withdraw Now</a>
+            <div class="card action-card">
+                <div class="icon-box withdraw-icon"><i class="fas fa-arrow-up"></i></div>
+                <h3>Withdraw</h3>
+                <a href="withdraw.html" class="btn btn-outline">Get Cash</a>
             </div>
-            <div class="card">
-                <h3>Transaction History</h3>
-                <p>View your past deposits and withdrawals.</p>
-                <br>
-                <a href="transactions.html" class="btn">View History</a>
+            <div class="card action-card" id="transferCard">
+                <div class="icon-box transfer-icon"><i class="fas fa-exchange-alt"></i></div>
+                <h3>Transfer</h3>
+                <!-- Trigger Modal -->
+                <button onclick="toggleTransferModal()" class="btn btn-outline">Send Money</button>
             </div>
+            <div class="card action-card">
+                <div class="icon-box history-icon"><i class="fas fa-list"></i></div>
+                <h3>History</h3>
+                <a href="transactions.html" class="btn btn-outline">View Log</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transfer Modal (Hidden by default) -->
+    <div id="transferModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleTransferModal()">&times;</span>
+            <h2><i class="fas fa-paper-plane"></i> Money Transfer</h2>
+            <div id="transferAlert" class="alert"></div>
+            <form id="transferForm">
+                <div class="form-group">
+                    <label>Beneficiary Account Number</label>
+                    <input type="text" id="beneficiaryAcct" placeholder="e.g. 100000002" required>
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="transferAmount" min="1" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-block">Send Securely</button>
+            </form>
         </div>
     </div>
 
     <script src="js/auth.js"></script>
     <script src="js/banking.js"></script>
     <script>
-        // Load balance on init
-        getBalance();
+        // Init Dashboard
+        const user = checkAuth();
+        if (user) {
+            document.getElementById('userFullName').textContent = user.fullName;
+            document.getElementById('accountNumber').textContent = user.accountNumber;
+            document.getElementById('lastLoginTime').textContent = user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'First Login';
+
+            // Low Balance Warning
+            if (user.balance < 500) {
+                document.getElementById('lowBalanceWarning').style.display = 'block';
+                document.querySelector('.balance-amount').classList.add('warn-balance');
+            }
+
+            // Calculate Insights
+            calculateInsights(user);
+            getBalance(); // From banking.js
+        }
+
+        function calculateInsights(user) {
+            let totalIn = 0;
+            let totalOut = 0;
+            let maxAmt = 0;
+            const currentMonth = new Date().getMonth();
+
+            user.transactions.forEach(t => {
+                // Ensure date parsing works (MM/DD/YYYY format from localeDateString)
+                const txnDate = new Date(t.date);
+                if (!isNaN(txnDate) && txnDate.getMonth() === currentMonth) {
+                    if (t.type === 'DEPOSIT' || t.type === 'TRANSFER_RECEIVED') {
+                        totalIn += t.amount;
+                    } else {
+                        totalOut += t.amount;
+                    }
+                    if (t.amount > maxAmt) maxAmt = t.amount;
+                }
+            });
+
+            document.getElementById('totalIn').textContent = `$${totalIn.toFixed(2)}`;
+            document.getElementById('totalOut').textContent = `$${totalOut.toFixed(2)}`;
+            document.getElementById('maxTxn').textContent = `$${maxAmt.toFixed(2)}`;
+        }
+
+        // Modal Logic
+        function toggleTransferModal() {
+            const modal = document.getElementById('transferModal');
+            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+        }
+
+        const transferForm = document.getElementById('transferForm');
+        const transferAlert = document.getElementById('transferAlert');
+
+        transferForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const acct = document.getElementById('beneficiaryAcct').value;
+            const amount = document.getElementById('transferAmount').value;
+            const btn = transferForm.querySelector('button');
+            const originalText = btn.textContent;
+
+            btn.disabled = true;
+            btn.textContent = "Processing Transfer...";
+            transferAlert.style.display = 'none';
+
+            const result = await handleTransfer(acct, amount);
+
+            if (result.success) {
+                transferAlert.className = 'alert alert-success';
+                transferAlert.textContent = `Successful! Sent $${amount} to ${result.receiverName}.`;
+                transferAlert.style.display = 'block';
+                getBalance(); // Update UI
+                setTimeout(() => {
+                    toggleTransferModal();
+                    transferForm.reset();
+                    transferAlert.style.display = 'none';
+                    // Re-calculate insights after transfer
+                    const freshUser = getCurrentUser();
+                    calculateInsights(freshUser);
+                }, 2000);
+            } else {
+                transferAlert.className = 'alert alert-danger';
+                transferAlert.textContent = result.message;
+                transferAlert.style.display = 'block';
+            }
+            btn.disabled = false;
+            btn.textContent = originalText;
+        });
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Load Saved Theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
     </script>
 </body>
 
